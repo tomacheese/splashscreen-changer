@@ -93,7 +93,7 @@ func cropToAspectRatio(img image.Image, width, height int) image.Image {
 
 	// 切り取った画像を指定のサイズにリサイズ
 	dst := image.NewRGBA(image.Rect(0, 0, width, height))
-	draw.Draw(dst, dst.Bounds(), croppedImg, croppedImg.Bounds().Min, draw.Src)
+	draw.CatmullRom.Scale(dst, dst.Rect, croppedImg, croppedImg.Bounds(), draw.Over, nil)
 
 	return dst
 }
