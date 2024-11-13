@@ -26,7 +26,7 @@ func GetAppCommit() string {
 	}
 
 	if buildInfo, ok := debug.ReadBuildInfo(); ok {
-		return buildInfo.Main.Sum
+		for _, setting := range buildInfo.Settings { if setting.Key == "vcs.revision" { return setting.Value } }
 	}
 
 	return "unknown"
