@@ -147,15 +147,15 @@ func checkConfig(config *Config) error {
 				switch field.Kind() {
 				case reflect.String:
 					if field.String() == "" {
-						return fmt.Errorf("%s is required but was empty", fieldName)
+						return fmt.Errorf("%s is required but was empty", strings.ToLower(fieldName))
 					}
 				case reflect.Bool:
 					if !field.Bool() {
-						return fmt.Errorf("%s is required", fieldName)
+						return fmt.Errorf("%s is required", strings.ToLower(fieldName))
 					}
 				case reflect.Int:
 					if field.Int() == 0 {
-						return fmt.Errorf("%s is required", fieldName)
+						return fmt.Errorf("%s is required", strings.ToLower(fieldName))
 					}
 				}
 			}
