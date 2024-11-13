@@ -86,9 +86,16 @@ func cropToAspectRatio(img image.Image, width, height int) image.Image {
 		cropRect = image.Rect(0, y0, srcWidth, y0+newHeight)
 	}
 
-	return img.(interface {
+	// 指定された範囲を切り取る
+	croppedImg := img.(interface {
 		SubImage(r image.Rectangle) image.Image
 	}).SubImage(cropRect)
+
+	// 切り取った画像を指定のサイズにリサイズ
+	dst := image.NewRGBA(image.Rect(0, 0, width, height))
+	draw.Draw(dst, dst.Bounds(), croppedImg, croppedImg.Bounds().Min, draw.Src)
+
+	return dst
 }
 
 // PNGファイルをリサイズする関数
@@ -167,7 +174,6 @@ func main() {
 	if *vFlag {
 		fmt.Println("splashscreen-changer")
 		fmt.Println("|- Version", GetAppVersion())
-		fmt.Println("|- Commit:", GetAppCommit())
 		fmt.Println("|- Build date:", GetAppDate())
 		return
 	}
