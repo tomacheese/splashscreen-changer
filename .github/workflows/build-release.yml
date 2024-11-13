@@ -39,6 +39,9 @@ jobs:
           custom_release_rules: "feat:minor:✨ Features,fix:patch:🐛 Fixes,docs:patch:📰 Docs,chore:patch:🎨 Chore,pref:patch:🎈 Performance improvements,refactor:patch:🧹 Refactoring,build:patch:🔍 Build,ci:patch:🔍 CI,revert:patch:⏪ Revert,style:patch:🧹 Style,test:patch:👀 Test,release:major:📦 Release"
           dry_run: ${{ github.event.pull_request.merged == true && 'false' || 'true' }}
 
+      - name: 🏷️ Fetch tags
+        run: git fetch --tags
+
       - name: 🛠️ Set up Go
         uses: actions/setup-go@v5
         with:
@@ -60,4 +63,5 @@ jobs:
       - name: 📦 Upload artifacts
         uses: actions/upload-artifact@v4
         with:
+          name: dist
           path: dist
