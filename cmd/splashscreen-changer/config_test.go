@@ -12,7 +12,7 @@ func TestLoadConfig(t *testing.T) {
 	tmpDir := os.TempDir()
 	sourceDirPath := filepath.Join(tmpDir, "source")
 	if err := os.MkdirAll(sourceDirPath, os.ModePerm); err != nil { t.Fatalf("Failed to create source directory: %v", err) }
-	defer os.RemoveAll(sourceDirPath)
+	defer func() { if err := os.RemoveAll(sourceDirPath); err != nil { t.Errorf("Failed to remove source directory: %v", err) } }()
 	destinationDirPath := filepath.Join(tmpDir, "destination")
 	if err := os.MkdirAll(filepath.Join(destinationDirPath, "EasyAntiCheat"), os.ModePerm); err != nil { t.Fatalf("Failed to create destination directory: %v", err) }
 	defer os.RemoveAll(destinationDirPath)
