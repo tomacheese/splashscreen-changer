@@ -14,7 +14,7 @@ func TestLoadConfig(t *testing.T) {
 	if err := os.MkdirAll(sourceDirPath, os.ModePerm); err != nil { t.Fatalf("Failed to create source directory: %v", err) }
 	defer os.RemoveAll(sourceDirPath)
 	destinationDirPath := filepath.Join(tmpDir, "destination")
-	os.MkdirAll(filepath.Join(destinationDirPath, "EasyAntiCheat"), os.ModePerm)
+	if err := os.MkdirAll(filepath.Join(destinationDirPath, "EasyAntiCheat"), os.ModePerm); err != nil { t.Fatalf("Failed to create destination directory: %v", err) }
 	defer os.RemoveAll(destinationDirPath)
 
 	// Create a temporary config file
