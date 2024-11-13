@@ -86,9 +86,16 @@ func cropToAspectRatio(img image.Image, width, height int) image.Image {
 		cropRect = image.Rect(0, y0, srcWidth, y0+newHeight)
 	}
 
-	return img.(interface {
+	// 指定された範囲を切り取る
+	croppedImg := img.(interface {
 		SubImage(r image.Rectangle) image.Image
 	}).SubImage(cropRect)
+
+	// 切り取った画像を指定のサイズにリサイズ
+	dst := image.NewRGBA(image.Rect(0, 0, width, height))
+	draw.Draw(dst, dst.Bounds(), croppedImg, croppedImg.Bounds().Min, draw.Src)
+
+	return dst
 }
 
 // PNGファイルをリサイズする関数
@@ -129,9 +136,9 @@ func resizePNGFile(srcPath, destPath string, width, height int) error {
 func printHelp() {
 	fmt.Println("Usage: splashscreen-changer [options]")
 	fmt.Println("Options:")
-	fmt.Println("  --help, -h          Show this help message")
+	flag.PrintDefaults()
 	fmt.Println("Environment Variables:")
-	fmt.Println("  CONFIG_PATH         Path to the configuration file (default: config.yaml)")
+	fmt.Printf("  %-20s %s\n", "CONFIG_PATH", "Path to the configuration file (default: config.yaml)")
 
 	// Config 構造体のフィールドから環境変数のキーを生成して表示
 	configType := reflect.TypeOf(Config{})
@@ -146,17 +153,28 @@ func printHelp() {
 			fmt.Printf("  %-20s %s\n", envKey, helpTag)
 		}
 	}
+
+	fmt.Println()
+	fmt.Println("GitHub: https://github.com/tomacheese/splashscreen-changer")
 }
 
 func main() {
 	// コマンドライン引数を解析する
-	helpFlag := flag.Bool("help", false, "Show help message")
 	hFlag := flag.Bool("h", false, "Show help message")
+	vFlag := flag.Bool("v", false, "Show version")
 	flag.Parse()
 
 	// ヘルプメッセージを表示する
-	if *helpFlag || *hFlag {
+	if *hFlag {
 		printHelp()
+		return
+	}
+
+	// バージョン情報を表示する
+	if *vFlag {
+		fmt.Println("splashscreen-changer")
+		fmt.Println("|- Version", GetAppVersion())
+		fmt.Println("|- Build date:", GetAppDate())
 		return
 	}
 
