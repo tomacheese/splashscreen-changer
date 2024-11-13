@@ -50,14 +50,14 @@ jobs:
       - name: 🧪 Test
         run: go test -v ./...
 
+      - name: 🚀 GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          args: release --clean ${{ github.event.pull_request.merged == false && '--skip=validate,publish --snapshot' || '' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: 📦 Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           path: dist
-
-      - name: 🚀 GoReleaser
-        uses: goreleaser/goreleaser-action@v6
-        with:
-          args: release --clean ${{ github.event.pull_request.merged == false && '--skip=validate,publish' || '' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
