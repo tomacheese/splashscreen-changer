@@ -58,6 +58,6 @@ jobs:
       - name: 🚀 GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
-          args: release --rm-dist ${{ github.event.pull_request.merged == false && '--skip=validate,publish' || '' }}
+          args: release --clean ${{ github.event.pull_request.merged == false && '--skip=validate,publish' || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
