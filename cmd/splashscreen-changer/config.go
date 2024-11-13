@@ -45,7 +45,7 @@ func LoadConfig(filename string) (*Config, error) {
 	setDefaults(&config)
 
 	// 設定ファイルの内容をチェック
-	err := CheckConfig(&config)
+	err := checkConfig(&config)
 	return &config, err
 }
 
@@ -76,11 +76,17 @@ func overrideConfigWithEnv(config *Config) {
 				case reflect.String:
 					field.SetString(value)
 				case reflect.Bool:
-					boolValue, _ := strconv.ParseBool(value)
-					field.SetBool(boolValue)
+					if boolValue, err := strconv.ParseBool(value); err == nil {
+						field.SetBool(boolValue)
+					} else {
+						fmt.Printf("Error parsing bool for %s: %v\n", envKey, err)
+					}
 				case reflect.Int:
-					intValue, _ := strconv.Atoi(value)
-					field.SetInt(int64(intValue))
+					if intValue, err := strconv.Atoi(value); err == nil {
+						field.SetInt(int64(intValue))
+					} else {
+						fmt.Printf("Error parsing int for %s: %v\n", envKey, err)
+					}
 				}
 			}
 		}
@@ -122,7 +128,7 @@ func setDefaults(config *Config) {
 }
 
 // 設定ファイルの内容をチェックする
-func CheckConfig(config *Config) error {
+func checkConfig(config *Config) error {
 	// 各フィールドが空でないかチェック
 	configValue := reflect.ValueOf(config).Elem()
 	configType := configValue.Type()

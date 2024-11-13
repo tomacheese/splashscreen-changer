@@ -201,14 +201,6 @@ func main() {
 
 	// ファイルをリサイズして EasyAntiCheat ディレクトリに保存する
 	destFile := filepath.Join(config.Destination.Path, "EasyAntiCheat", "SplashScreen.png")
-	// 指定されていない場合は 800 にする
-	if config.Destination.Width == 0 {
-		config.Destination.Width = 800
-	}
-	// 指定されていない場合は 450 にする
-	if config.Destination.Height == 0 {
-		config.Destination.Height = 450
-	}
 	err = resizePNGFile(pickedFile, destFile, config.Destination.Width, config.Destination.Height)
 	if err != nil {
 		fmt.Println("Error:", err)
