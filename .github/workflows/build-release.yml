@@ -22,7 +22,7 @@ on:
   merge_group:
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Check out the repo
