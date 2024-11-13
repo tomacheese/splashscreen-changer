@@ -11,11 +11,23 @@ func TestLoadConfig(t *testing.T) {
 	// Create necessary directories
 	tmpDir := os.TempDir()
 	sourceDirPath := filepath.Join(tmpDir, "source")
-	if err := os.MkdirAll(sourceDirPath, os.ModePerm); err != nil { t.Fatalf("Failed to create source directory: %v", err) }
-	defer func() { if err := os.RemoveAll(sourceDirPath); err != nil { t.Errorf("Failed to remove source directory: %v", err) } }()
+	if err := os.MkdirAll(sourceDirPath, os.ModePerm); err != nil {
+		t.Fatalf("Failed to create source directory: %v", err)
+	}
+	defer func() {
+		if err := os.RemoveAll(sourceDirPath); err != nil {
+			t.Errorf("Failed to remove source directory: %v", err)
+		}
+	}()
 	destinationDirPath := filepath.Join(tmpDir, "destination")
-	if err := os.MkdirAll(filepath.Join(destinationDirPath, "EasyAntiCheat"), os.ModePerm); err != nil { t.Fatalf("Failed to create destination directory: %v", err) }
-	defer func() { if err := os.RemoveAll(destinationDirPath); err != nil { t.Fatalf("Failed to remove destination directory: %v", err) } }()
+	if err := os.MkdirAll(filepath.Join(destinationDirPath, "EasyAntiCheat"), os.ModePerm); err != nil {
+		t.Fatalf("Failed to create destination directory: %v", err)
+	}
+	defer func() {
+		if err := os.RemoveAll(destinationDirPath); err != nil {
+			t.Fatalf("Failed to remove destination directory: %v", err)
+		}
+	}()
 
 	// Create a temporary config file
 	configContent := `

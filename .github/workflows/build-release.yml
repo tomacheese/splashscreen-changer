@@ -66,3 +66,8 @@ jobs:
         with:
           name: dist
           path: dist
+
+      - name: 🧹 Check formatting
+        run: |
+          go fmt ./...
+          git diff --exit-code
