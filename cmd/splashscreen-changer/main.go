@@ -129,9 +129,9 @@ func resizePNGFile(srcPath, destPath string, width, height int) error {
 func printHelp() {
 	fmt.Println("Usage: splashscreen-changer [options]")
 	fmt.Println("Options:")
-	fmt.Println("  --help, -h          Show this help message")
+	flag.PrintDefaults()
 	fmt.Println("Environment Variables:")
-	fmt.Println("  CONFIG_PATH         Path to the configuration file (default: config.yaml)")
+	fmt.Printf("  %-20s %s\n", "CONFIG_PATH", "Path to the configuration file (default: config.yaml)")
 
 	// Config 構造体のフィールドから環境変数のキーを生成して表示
 	configType := reflect.TypeOf(Config{})
@@ -146,17 +146,29 @@ func printHelp() {
 			fmt.Printf("  %-20s %s\n", envKey, helpTag)
 		}
 	}
+
+	fmt.Println()
+	fmt.Println("GitHub: https://github.com/tomacheese/splashscreen-changer")
 }
 
 func main() {
 	// コマンドライン引数を解析する
-	helpFlag := flag.Bool("help", false, "Show help message")
 	hFlag := flag.Bool("h", false, "Show help message")
+	vFlag := flag.Bool("v", false, "Show version")
 	flag.Parse()
 
 	// ヘルプメッセージを表示する
-	if *helpFlag || *hFlag {
+	if *hFlag {
 		printHelp()
+		return
+	}
+
+	// バージョン情報を表示する
+	if *vFlag {
+		fmt.Println("splashscreen-changer")
+		fmt.Println("|- Version", GetAppVersion())
+		fmt.Println("|- Commit:", GetAppCommit())
+		fmt.Println("|- Build date:", GetAppDate())
 		return
 	}
 
