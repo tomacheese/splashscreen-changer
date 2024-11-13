@@ -11,7 +11,7 @@ func TestLoadConfig(t *testing.T) {
 	// Create necessary directories
 	tmpDir := os.TempDir()
 	sourceDirPath := filepath.Join(tmpDir, "source")
-	os.MkdirAll(sourceDirPath, os.ModePerm)
+	if err := os.MkdirAll(sourceDirPath, os.ModePerm); err != nil { t.Fatalf("Failed to create source directory: %v", err) }
 	defer os.RemoveAll(sourceDirPath)
 	destinationDirPath := filepath.Join(tmpDir, "destination")
 	os.MkdirAll(filepath.Join(destinationDirPath, "EasyAntiCheat"), os.ModePerm)
