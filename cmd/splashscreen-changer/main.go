@@ -138,7 +138,7 @@ func printHelp() {
 	fmt.Println("Options:")
 	flag.PrintDefaults()
 	fmt.Println("Environment Variables:")
-	fmt.Printf("  %-20s %s\n", "CONFIG_PATH", "Path to the configuration file (default: config.yaml)")
+	fmt.Printf("  %-20s %s\n", "CONFIG_PATH", "Path to the configuration file (default: data/config.yaml)")
 
 	// Config 構造体のフィールドから環境変数のキーを生成して表示
 	configType := reflect.TypeOf(Config{})
@@ -178,10 +178,10 @@ func main() {
 		return
 	}
 
-	// 設定ファイルを読み込む。設定ファイルパスは環境変数 CONFIG_PATH で指定し、指定されていない場合は "config.yaml" とする。
+	// 設定ファイルを読み込む。設定ファイルパスは環境変数 CONFIG_PATH で指定し、指定されていない場合は "data/config.yaml" とする。
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
-		configPath = "config.yaml"
+		configPath = "data/config.yaml"
 	}
 	config, err := LoadConfig(configPath)
 	if err != nil {
