@@ -160,30 +160,31 @@ func printHelp() {
 
 func main() {
 	// コマンドライン引数を解析する
-	hFlag := flag.Bool("h", false, "Show help message")
-	vFlag := flag.Bool("v", false, "Show version")
+	helpFlag := flag.Bool("help", false, "Show help message")
+	versionFlag := flag.Bool("version", false, "Show version")
+	configPath := flag.String("config", os.Getenv("CONFIG_PATH"), "Path to the configuration file")
 	flag.Parse()
 
 	// ヘルプメッセージを表示する
-	if *hFlag {
+	if *helpFlag {
 		printHelp()
 		return
 	}
 
 	// バージョン情報を表示する
-	if *vFlag {
+	if *versionFlag {
 		fmt.Println("splashscreen-changer")
 		fmt.Println("|- Version", GetAppVersion())
 		fmt.Println("|- Build date:", GetAppDate())
 		return
 	}
 
-	// 設定ファイルを読み込む。設定ファイルパスは環境変数 CONFIG_PATH で指定し、指定されていない場合は "data/config.yaml" とする。
-	configPath := os.Getenv("CONFIG_PATH")
-	if configPath == "" {
-		configPath = "data/config.yaml"
+	// 設定ファイルを読み込む。設定ファイルパスは環境変数 CONFIG_PATH または引数 -config で指定し、指定されていない場合は "data/config.yaml" とする。
+	if *configPath == "" {
+		*configPath = "data/config.yaml"
 	}
-	config, err := LoadConfig(configPath)
+	fmt.Println("Loading config file:", *configPath)
+	config, err := LoadConfig(*configPath)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
