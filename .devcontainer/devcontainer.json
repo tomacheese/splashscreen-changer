@@ -1,0 +1,13 @@
+{
+  "name": "tomacheese/splashscreen-changer",
+  "image": "mcr.microsoft.com/devcontainers/go:1-1.23-bookworm",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-vscode.go"]
+    },
+    "settings": {
+      "go.useLanguageServer": true
+    }
+  },
+  "postCreateCommand": "go mod download"
+}
