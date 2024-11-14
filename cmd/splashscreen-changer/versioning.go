@@ -23,8 +23,8 @@ func GetAppVersion() string {
 
 	if buildInfo, ok := debug.ReadBuildInfo(); ok {
 		// vから始まる場合は、vを削除して返す
-		if len(version) > 0 && version[0] == 'v' {
-			return version[1:]
+		if len(buildInfo.Main.Version) > 0 && buildInfo.Main.Version[0] == 'v' {
+			return buildInfo.Main.Version[1:]
 		}
 		return buildInfo.Main.Version
 	}
