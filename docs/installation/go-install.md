@@ -16,7 +16,7 @@ go install github.com/tomacheese/splashscreen-changer/cmd/splashscreen-changer@l
 C:\Users\%USERNAME%\go\bin
 ```
 
-## 4. 設定ファイルの作成
+## 2. 設定ファイルの作成
 
 このアプリケーションは、なにも設定しない場合次のような動作をします。  
 **これらの動作を変更したい場合は、設定ファイルの作成が必要** です。そうでない場合は、次に進んでください。
