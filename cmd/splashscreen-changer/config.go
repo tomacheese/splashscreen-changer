@@ -12,11 +12,11 @@ import (
 
 type Config struct {
 	Source struct {
-		Path      string `yaml:"path" help:"Path to the source directory" required:"true"`
-		Recursive bool   `yaml:"recursive" help:"Whether to search for PNG files recursively. Default is false" default:"false"`
+		Path      string `yaml:"path" help:"Path to the source directory. If not specified, the VRChat folder in the user's Pictures folder is searched and used if available. If not, an error is returned."`
+		Recursive bool   `yaml:"recursive" help:"Whether to search for PNG files recursively" default:"true"`
 	} `yaml:"source" required:"true"`
 	Destination struct {
-		Path   string `yaml:"path" help:"Path to the destination directory. The specified directory must have an EasyAntiCheat directory" required:"true"`
+		Path   string `yaml:"path" help:"Path to the destination directory. The specified directory must have an EasyAntiCheat directory. If not specified, the VRChat folder is searched based on the Steam library folder and used if available. If not, an error is returned."`
 		Width  int    `yaml:"width" help:"Width of the destination image" default:"800"`
 		Height int    `yaml:"height" help:"Height of the destination image" default:"450"`
 	} `yaml:"destination" required:"true"`
@@ -163,17 +163,22 @@ func checkConfig(config *Config) error {
 	}
 
 	// パスが存在するかチェック
-	if _, err := os.Stat(config.Source.Path); err != nil {
-		return fmt.Errorf("source path '%s' does not exist", config.Source.Path)
-	}
-	if _, err := os.Stat(config.Destination.Path); err != nil {
-		return fmt.Errorf("destination path '%s' does not exist", config.Destination.Path)
+	if config.Source.Path != "" {
+		if _, err := os.Stat(config.Source.Path); err != nil {
+			return fmt.Errorf("source path '%s' does not exist", config.Source.Path)
+		}
 	}
 
-	// destination.path には "EasyAntiCheat" ディレクトリが存在すること
-	eacPath := config.Destination.Path + "/EasyAntiCheat"
-	if _, err := os.Stat(eacPath); err != nil {
-		return fmt.Errorf("EasyAntiCheat directory not found in destination path '%s'", config.Destination.Path)
+	if config.Destination.Path != "" {
+		if _, err := os.Stat(config.Destination.Path); err != nil {
+			return fmt.Errorf("destination path '%s' does not exist", config.Destination.Path)
+		}
+
+		// destination.path には "EasyAntiCheat" ディレクトリが存在すること
+		eacPath := config.Destination.Path + "/EasyAntiCheat"
+		if _, err := os.Stat(eacPath); err != nil {
+			return fmt.Errorf("EasyAntiCheat directory not found in destination path '%s'", config.Destination.Path)
+		}
 	}
 
 	// destination.width が 0 より大きいこと
