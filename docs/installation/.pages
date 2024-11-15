@@ -1,0 +1,5 @@
+title: インストール
+nav:
+  - portable.md
+  - scoop.md
+  - go-install.md
