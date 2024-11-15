@@ -76,6 +76,7 @@ extra_css:
 plugins:
   - search
   - git-revision-date-localized:
+      enabled: !ENV [ENABLED_GIT_REVISION_DATE, True]
       enable_creation_date: true
       type: iso_datetime
       timezone: Asia/Tokyo

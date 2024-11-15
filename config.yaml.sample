@@ -1,5 +1,5 @@
 source:
-  path: C:\Users\{Username}\Pictures\VRChat
+  path: C:\Users\{Username}\Pictures\VRChat\splashscreen-photos\
   recursive: true
 destination:
   path: C:\Program Files (x86)\Steam\steamapps\common\VRChat

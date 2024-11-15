@@ -17,18 +17,17 @@ VRChat に対しての利用を想定していますが、他のアプリケー�
 本アプリケーションのインストールには、いくつかの方法があります。  
 具体的なインストール方法については、リンク先をご覧ください。
 
-- [実行ファイルによるポータブルインストール](installation/portable.md) (おすすめ)
+- [実行ファイル (exe) によるポータブルインストール](installation/portable.md) (おすすめ)
 - [Scoop によるインストール](installation/scoop.md)
 - [go install によるインストール](installation/go-install.md)
 
-## 🔍 使い方
-
-具体的な使い方については、[使い方](usage/index.md) をご覧ください。
-
 ## 🛠️ 設定
 
-このアプリケーションを使うためには、最初に設定が必要です。  
-設定方法については、[設定](settings/index.md) をご覧ください。
+このアプリケーションの動作をカスタムしたい場合は、設定ファイルが必要になります。  
+設定方法については、[設定ファイル](settings/file.md) ページをご覧ください。
+
+また、このアプリケーションは、実行するたびにランダムに画像を設定します。  
+そのため、なんらかの条件で定期的に背景画像を変えたいという場合は、[自動起動](settings/autostart/index.md) 設定が必要です。
 
 ## 🎁 寄付
 
@@ -39,4 +38,4 @@ VRChat に対しての利用を想定していますが、他のアプリケー�
 
 ## 📑 ライセンス
 
-このプロジェクトのライセンスは [MIT License](LICENSE) です。
+このプロジェクトのライセンスは [MIT License](https://github.com/tomacheese/splashscreen-changer/blob/master/LICENSE) です。
