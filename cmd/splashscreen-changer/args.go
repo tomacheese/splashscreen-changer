@@ -15,7 +15,7 @@ func printHelp() {
 	fmt.Println("Options:")
 	flag.PrintDefaults()
 	fmt.Println("Environment Variables:")
-	fmt.Printf("  %-20s %s\n", "CONFIG_PATH", "Path to the configuration file (default: data/config.yaml)")
+	fmt.Printf("  %-20s %s\n", "CONFIG_PATH", "Path to the configuration file (default: data/config.yml)")
 
 	// Config 構造体のフィールドから環境変数のキーを生成して表示
 	configType := reflect.TypeOf(Config{})
