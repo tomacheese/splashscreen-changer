@@ -6,7 +6,11 @@
       "extensions": ["ms-vscode.go"]
     },
     "settings": {
-      "go.useLanguageServer": true
+      "go.useLanguageServer": true,
+      "go.vetFlags": ["-unsafeptr=false"],
+      "gopls": {
+        "analyses": { "unsafeptr": false }
+      }
     }
   },
   "postCreateCommand": "go mod download"
