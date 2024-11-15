@@ -1,0 +1,6 @@
+title: 設定
+nav:
+  - file.md
+  - envvar.md
+  - argument.md
+  - autostart

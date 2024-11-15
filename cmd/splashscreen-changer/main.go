@@ -52,7 +52,7 @@ func listPNGFiles(root string, isRecursive bool) ([]string, error) {
 	return pngFiles, nil
 }
 
-// PNGファイルリストからランダムに1つ選択する関数
+// PNGファイルリストからラダムに1つ選択する関数
 func pickRandomFile(files []string) (string, error) {
 	if len(files) == 0 {
 		return "", fmt.Errorf("no PNG files found")
@@ -97,8 +97,12 @@ func cropToAspectRatio(img image.Image, width, height int) image.Image {
 	return dst
 }
 
-// PNGファイルをリサイズする関数
-// 同じアスペクト比でない場合、元の画像を中心を基準に切り取る
+// resizePNGFileは、指定されたPNG画像を指定の幅と高さにリサイズし、保存します。
+// リサイズの際、元の画像のアスペクト比が異なる場合は、中央を基準にクロップ（切り取り）します。
+// - srcPath: 元のPNGファイルのパス
+// - destPath: リサイズ後のPNGファイルの保存先パス
+// - width: リサイズ後の画像の幅
+// - height: リサイズ後の画像の高さ
 func resizePNGFile(srcPath, destPath string, width, height int) error {
 	srcFile, err := os.Open(srcPath)
 	if err != nil {
@@ -146,7 +150,7 @@ func isGoRun() bool {
 }
 
 func getConfigPath(configParamPath *string) string {
-	// 設定ファイルパスは環境変数 CONFIG_PATH または引数 -config で指定し、指定されていない場合は "data/config.yaml" とする。
+	// 設定ファイルパスは環境変数 CONFIG_PATH または引数 -config で指定し、指定されていない場合は "data/config.yml" とする。
 	// "data/config.yml" の場所は、実行ファイルと同じディレクトリにあるものとする。go runで実行する場合は、カレントディレクトリにあるものとする。
 	if *configParamPath != "" {
 		return *configParamPath
