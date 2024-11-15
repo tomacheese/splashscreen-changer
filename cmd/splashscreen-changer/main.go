@@ -131,11 +131,45 @@ func resizePNGFile(srcPath, destPath string, width, height int) error {
 	return nil
 }
 
+func isGoRun() bool {
+	executable, err := os.Executable()
+	if err != nil {
+		return false
+	}
+
+	goTmpDir := os.Getenv("GOTMPDIR")
+	if goTmpDir != "" {
+		return strings.HasPrefix(executable, goTmpDir)
+	}
+
+	return strings.HasPrefix(executable, os.TempDir())
+}
+
+func getConfigPath(configParamPath *string) string {
+	// 設定ファイルパスは環境変数 CONFIG_PATH または引数 -config で指定し、指定されていない場合は "data/config.yaml" とする。
+	// "data/config.yml" の場所は、実行ファイルと同じディレクトリにあるものとする。go runで実行する場合は、カレントディレクトリにあるものとする。
+	if *configParamPath != "" {
+		return *configParamPath
+	}
+
+	exePath, err := os.Executable()
+	if err != nil {
+		return filepath.Join("data", "config.yml")
+	}
+
+	if isGoRun() {
+		return filepath.Join("data", "config.yml")
+	}
+
+	exeDir := filepath.Dir(exePath)
+	return filepath.Join(exeDir, "data", "config.yml")
+}
+
 func main() {
 	// コマンドライン引数を解析する
 	helpFlag := flag.Bool("help", false, "Show help message")
 	versionFlag := flag.Bool("version", false, "Show version")
-	configPath := flag.String("config", os.Getenv("CONFIG_PATH"), "Path to the configuration file")
+	configParamPath := flag.String("config", os.Getenv("CONFIG_PATH"), "Path to the configuration file")
 	flag.Parse()
 
 	// ヘルプメッセージを表示する
@@ -152,12 +186,11 @@ func main() {
 		return
 	}
 
-	// 設定ファイルを読み込む。設定ファイルパスは環境変数 CONFIG_PATH または引数 -config で指定し、指定されていない場合は "data/config.yaml" とする。
-	if *configPath == "" {
-		*configPath = "data/config.yaml"
-	}
-	fmt.Println("Loading config file:", *configPath)
-	config, err := LoadConfig(*configPath)
+	// 設定ファイルを読み込む。
+	configPath := getConfigPath(configParamPath)
+
+	fmt.Println("Loading config file:", configPath)
+	config, err := LoadConfig(configPath)
 	if err != nil {
 		fmt.Println("Failed to load configuration file:", err)
 		return
