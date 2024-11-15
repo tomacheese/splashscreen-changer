@@ -1,3 +1,6 @@
+//go:build windows
+// +build windows
+
 package main
 
 import (
@@ -10,16 +13,12 @@ import (
 )
 
 func GetSteamInstallFolder() (string, error) {
-	// only windows
-	if os.Getenv("OS") != "Windows_NT" {
-		return "", nil
-	}
-
 	// Open the key for reading
 	k, err := registry.OpenKey(registry.LOCAL_MACHINE, `SOFTWARE\Wow6432Node\Valve\Steam`, registry.QUERY_VALUE)
 	if err != nil {
 		return "", err
 	}
+	defer k.Close()
 
 	// Read the value of the key
 	installPath, _, err := k.GetStringValue("InstallPath")

@@ -126,8 +126,8 @@ destination:
 	if config.Source.Path != filepath.Join(tmpDir, "source") {
 		t.Errorf("Expected source path to be '%s', got '%s'", filepath.Join(tmpDir, "source"), config.Source.Path)
 	}
-	if config.Source.Recursive {
-		t.Errorf("Expected source recursive to be false, got true")
+	if !config.Source.Recursive {
+		t.Errorf("Expected source recursive to be true got false")
 	}
 	if config.Destination.Path != filepath.Join(tmpDir, "destination") {
 		t.Errorf("Expected destination path to be '%s', got '%s'", filepath.Join(tmpDir, "destination"), config.Destination.Path)
