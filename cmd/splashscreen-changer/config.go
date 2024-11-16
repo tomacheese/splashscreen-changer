@@ -20,6 +20,9 @@ type Config struct {
 		Width  int    `yaml:"width" help:"Width of the destination image" default:"800"`
 		Height int    `yaml:"height" help:"Height of the destination image" default:"450"`
 	} `yaml:"destination" required:"true"`
+	Log struct {
+		Path string `yaml:"path" help:"Path to the log file" default:""`
+	} `yaml:"log"`
 }
 
 // 設定ファイルを読み込む

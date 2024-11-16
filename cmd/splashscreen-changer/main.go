@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"image"
 	"image/png"
+	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -184,81 +186,96 @@ func main() {
 
 	// バージョン情報を表示する
 	if *versionFlag {
-		fmt.Println("splashscreen-changer")
-		fmt.Println("|- Version", GetAppVersion())
-		fmt.Println("|- Build date:", GetAppDate())
+		log.Println("splashscreen-changer")
+		log.Println("|- Version", GetAppVersion())
+		log.Println("|- Build date:", GetAppDate())
 		return
 	}
 
 	// 設定ファイルを読み込む。
 	configPath := getConfigPath(configParamPath)
 
-	fmt.Println("Loading config file:", configPath)
+	log.Println("Loading config file:", configPath)
 	config, err := LoadConfig(configPath)
 	if err != nil {
-		fmt.Println("Failed to load configuration file:", err)
+		log.Println("Failed to load configuration file:", err)
 		return
 	}
 
+	// ログファイルを開く
+	path := getLogFilePath(&config.Log.Path)
+	// ログファイルの親ディレクトリが存在しない場合は作成する
+	if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
+		log.Fatal(err)
+	}
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer file.Close()
+	mw := io.MultiWriter(os.Stdout, file)
+	log.SetOutput(mw)
+
 	sourcePath, err := getSourcePath(config)
 	if err != nil {
-		fmt.Println("Failed to obtain source path")
-		fmt.Println()
-		fmt.Println("The following steps are used to obtain the source paths. This error occurs because the following steps could not be taken to obtain the source path.")
-		fmt.Println("1. Environment variable SOURCE_PATH. If this is not set, the following steps are taken.")
-		fmt.Println("2. source.path in Configuration file. If this is not set, the following steps are taken.")
-		fmt.Println("3. Check if the VRChat folder exists in the Pictures folder in the user folder.")
-		fmt.Println("If the VRChat folder exists, the path to the VRChat folder is used as the source path.")
+		log.Println("Failed to obtain source path")
+		log.Println()
+		log.Println("The following steps are used to obtain the source paths. This error occurs because the following steps could not be taken to obtain the source path.")
+		log.Println("1. Environment variable SOURCE_PATH. If this is not set, the following steps are taken.")
+		log.Println("2. source.path in Configuration file. If this is not set, the following steps are taken.")
+		log.Println("3. Check if the VRChat folder exists in the Pictures folder in the user folder.")
+		log.Println("If the VRChat folder exists, the path to the VRChat folder is used as the source path.")
 		return
 	}
 
 	destinationPath, err := getDestinationPath(config)
 	if err != nil {
-		fmt.Println("Failed to obtain destination path")
-		fmt.Println()
-		fmt.Println("The following steps are used to obtain the destination paths. This error occurs because the following steps could not be taken to obtain the destination path.")
-		fmt.Println("1. Environment variable DESTINATION_PATH. If this is not set, the following steps are taken.")
-		fmt.Println("2. destination.path in Configuration file. If this is not set, the following steps are taken.")
-		fmt.Println("3. Get the installation destination folder of VRChat from the Steam library folder.")
-		fmt.Println("If the EasyAntiCheat folder exists in the VRChat folder, the path to the VRChat folder is used as the destination path.")
+		log.Println("Failed to obtain destination path")
+		log.Println()
+		log.Println("The following steps are used to obtain the destination paths. This error occurs because the following steps could not be taken to obtain the destination path.")
+		log.Println("1. Environment variable DESTINATION_PATH. If this is not set, the following steps are taken.")
+		log.Println("2. destination.path in Configuration file. If this is not set, the following steps are taken.")
+		log.Println("3. Get the installation destination folder of VRChat from the Steam library folder.")
+		log.Println("If the EasyAntiCheat folder exists in the VRChat folder, the path to the VRChat folder is used as the destination path.")
 		return
 	}
 
 	// 設定値を表示する
-	fmt.Printf("Source Path: %s\n", sourcePath)
-	fmt.Printf("Source Recursive: %t\n", config.Source.Recursive)
-	fmt.Printf("Destination Path: %s\n", destinationPath)
-	fmt.Printf("Destination Width: %d\n", config.Destination.Width)
-	fmt.Printf("Destination Height: %d\n", config.Destination.Height)
+	log.Printf("Source Path: %s\n", sourcePath)
+	log.Printf("Source Recursive: %t\n", config.Source.Recursive)
+	log.Printf("Destination Path: %s\n", destinationPath)
+	log.Printf("Destination Width: %d\n", config.Destination.Width)
+	log.Printf("Destination Height: %d\n", config.Destination.Height)
 
 	// ソースディレクトリ以下のPNGファイルをリストする
 	files, err := listPNGFiles(sourcePath, config.Source.Recursive)
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Println("Error:", err)
 		return
 	}
 
 	// ランダムで1つのファイルを選択する
 	if len(files) == 0 {
-		fmt.Println("No PNG files found")
+		log.Println("No PNG files found")
 		return
 	}
 
 	pickedFile, err := pickRandomFile(files)
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Println("Error:", err)
 		return
 	}
 
-	fmt.Println("Picked file:", pickedFile)
+	log.Println("Picked file:", pickedFile)
 
 	// ファイルをリサイズして EasyAntiCheat ディレクトリに保存する
 	destFile := filepath.Join(destinationPath, "EasyAntiCheat", "SplashScreen.png")
 	err = resizePNGFile(pickedFile, destFile, config.Destination.Width, config.Destination.Height)
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Println("Error:", err)
 		return
 	}
 
-	fmt.Println("Resized file saved to:", destFile)
+	log.Println("Resized file saved to:", destFile)
 }

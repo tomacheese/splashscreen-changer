@@ -37,6 +37,7 @@ func printHelp() {
 
 	fmt.Println()
 	fmt.Println("GitHub: https://github.com/tomacheese/splashscreen-changer")
+	fmt.Println("Booth: https://tomachi.booth.pm/items/6284870")
 }
 
 func getSourcePath(config *Config) (string, error) {
