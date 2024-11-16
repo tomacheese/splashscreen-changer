@@ -20,17 +20,17 @@ VRChat に対しての利用を想定していますが、他のアプリケー�
 本アプリケーションのインストールには、いくつかの方法があります。  
 具体的なインストール方法については、リンク先をご覧ください。
 
-- [実行ファイル (exe) によるポータブルインストール](installation/portable.md) (おすすめ)
-- [Scoop によるインストール](installation/scoop.md)
-- [go install によるインストール](installation/go-install.md)
+- [実行ファイル (exe) によるポータブルインストール](https://tomacheese.github.io/splashscreen-changer/installation/portable/) (おすすめ)
+- [Scoop によるインストール](https://tomacheese.github.io/splashscreen-changer/installation/scoop/)
+- [go install によるインストール](https://tomacheese.github.io/splashscreen-changer/installation/go-install/)
 
 ## 🛠️ 設定
 
 このアプリケーションの動作をカスタムしたい場合は、設定ファイルが必要になります。  
-設定方法については、[設定ファイル](settings/file.md) ページをご覧ください。
+設定方法については、[設定ファイル](https://tomacheese.github.io/splashscreen-changer/settings/file/) ページをご覧ください。
 
 また、このアプリケーションは、実行するたびにランダムに画像を設定します。  
-そのため、なんらかの条件で定期的にスプラッシュスクリーンを変えたいという場合は、[自動起動](settings/autostart/index.md) 設定が必要です。
+そのため、なんらかの条件で定期的にスプラッシュスクリーンを変えたいという場合は、[自動起動](https://tomacheese.github.io/splashscreen-changer/settings/autostart/) 設定が必要です。
 
 ## 🎁 寄付
 
