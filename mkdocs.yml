@@ -1,0 +1,84 @@
+site_name: splashscreen-changer
+
+repo_name: tomacheese/splashscreen-changer
+repo_url: https://github.com/tomacheese/splashscreen-changer
+edit_uri: edit/master/docs
+
+nav:
+  - Home: index.md
+  - ...
+
+theme:
+  name: material
+  language: ja
+  favicon: assets/favicon.png
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.expand
+    - navigation.indexes
+    - navigation.sticky
+    - navigation.sections
+    - toc.follow
+    - content.code.copy
+  icon:
+    logo: material/folder-multiple-image
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - footnotes
+  - admonition
+  - md_in_html
+  - pymdownx.magiclink
+  - pymdownx.details
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - mdx_truly_sane_lists:
+      nested_indent: 2
+  - attr_list
+  - md_in_html
+
+extra:
+  search:
+    language: ja
+
+extra_css:
+  - css/extra.css
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      enabled: !ENV [ENABLED_GIT_REVISION_DATE, True]
+      enable_creation_date: true
+      type: iso_datetime
+      timezone: Asia/Tokyo
+  - awesome-pages
+  - glightbox

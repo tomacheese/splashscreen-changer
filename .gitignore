@@ -28,3 +28,9 @@ go.work.sum
 # test files
 test/
 data/
+
+# virtual env
+venv/
+.venv/
+
+site/
