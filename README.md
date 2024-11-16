@@ -1,42 +1,44 @@
 # splashscreen-changer
 
-EasyAntiCheat を使用しているアプリケーションにおいて、起動時に表示されるスプラッシュスクリーンを以下のように変更するアプリケーションです。  
-VRChat に対しての利用を想定していますが、他のアプリケーションでも利用できます。
+[English](README.md) | [日本語](README-ja.md)
+
+This application changes the splash-screen displayed at startup in applications using EasyAntiCheat as follows.  
+This is intended for use with VRChat, but can be used with other applications as well.
 
 ![](docs/assets/customized-splashscreen.png)
 
-## ✨ 特徴
+## ✨ Features
 
-- 起動するごとに用意した画像からランダムで設定
-- 用意する画像は事前にリサイズ・クロップする必要なく、自動で処理
-- EasyAntiCheat を利用しているアプリケーションであれば VRChat 以外でも利用可能
-- VRChat 用に利用する場合は設定ファイルの作成をせずに使い始められる
-- 単一の実行ファイルで動作可能
+- Random setting from prepared images for each startup
+- Automatic processing of prepared images without the need to resize or crop them in advance
+- Can be used with applications other than VRChat, as long as they use EasyAntiCheat
+- If you want to use it for VRChat, you can start using it without creating a configuration file
+- Can run with a single executable file
 
-## 🚀 インストール手順
+## 🚀 Installation
 
-本アプリケーションのインストールには、いくつかの方法があります。  
-具体的なインストール方法については、リンク先をご覧ください。
+There are several ways to install this application.  
+Please see the link for specific installation instructions.
 
-- [実行ファイル (exe) によるポータブルインストール](installation/portable.md) (おすすめ)
-- [Scoop によるインストール](installation/scoop.md)
-- [go install によるインストール](installation/go-install.md)
+- [Portable installation by executable file (exe)](installation/portable.md) (Recommended)
+- [Installation by Scoop](installation/scoop.md)
+- [Installation by go install](installation/go-install.md)
 
-## 🛠️ 設定
+## 🛠️ Settings
 
-このアプリケーションの動作をカスタムしたい場合は、設定ファイルが必要になります。  
-設定方法については、[設定ファイル](settings/file.md) ページをご覧ください。
+If you want to customize the behavior of this application, you will need a configuration file.  
+Please see the [configuration file](settings/file.md) page for details on how to set up.
 
-また、このアプリケーションは、実行するたびにランダムに画像を設定します。  
-そのため、なんらかの条件で定期的にスプラッシュスクリーンを変えたいという場合は、[自動起動](settings/autostart/index.md) 設定が必要です。
+The application also sets a random image each time it is run.  
+Therefore, if you want to change the splash screen periodically under some condition, an [automatic starting](settings/autostart/index.md) setting is required.
 
-## 🎁 寄付
+## 🎁 Donation
 
-このプロジェクトでは、寄付を受け付けています。以下の方法で寄付が可能です。
+This project accepts donations. You can donate in the following ways:
 
-- Booth: 準備中
+- [Booth](https://tomachi.booth.pm/items/6284870)
 - GitHub Sponsor: [@book000](https://github.com/sponsors/book000)
 
-## 📑 ライセンス
+## 📑 License
 
-このプロジェクトのライセンスは [MIT License](LICENSE) です。
+The project is licensed under the [MIT License](LICENSE).
