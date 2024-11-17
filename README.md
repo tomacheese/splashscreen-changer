@@ -2,7 +2,7 @@
 
 [English](README.md) | [日本語](README-ja.md)
 
-This application changes the splash-screen displayed at startup in applications using EasyAntiCheat as follows.  
+This application randomly changes the splash screen displayed at startup in applications using EasyAntiCheat as follows.  
 This is intended for use with VRChat, but can be used with other applications as well.
 
 ![](docs/assets/customized-splashscreen.png)

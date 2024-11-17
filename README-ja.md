@@ -2,7 +2,7 @@
 
 [English](README.md) | [日本語](README-ja.md)
 
-EasyAntiCheat を使用しているアプリケーションにおいて、起動時に表示されるスプラッシュスクリーンを以下のように変更するアプリケーションです。  
+EasyAntiCheat を使用しているアプリケーションにおいて、起動時に表示されるスプラッシュスクリーンを以下のようにランダムで変更するアプリケーションです。  
 VRChat に対しての利用を想定していますが、他のアプリケーションでも利用できます。
 
 ![](docs/assets/customized-splashscreen.png)
