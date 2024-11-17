@@ -6,6 +6,23 @@ edit_uri: edit/master/docs
 
 nav:
   - Home: index.md
+  - インストール:
+      - installation/index.md
+      - installation/portable.md
+      - installation/scoop.md
+      - installation/go-install.md
+  - 設定:
+      - settings/index.md
+      - settings/file.md
+      - settings/envvar.md
+      - settings/argument.md
+      - 自動起動:
+          - settings/autostart/index.md
+          - settings/autostart/startup.md
+          - settings/autostart/taskscheduler.md
+          - settings/autostart/vrcx.md
+  - 寄付版:
+      - donation/settings-app.md
   - ...
 
 theme:
