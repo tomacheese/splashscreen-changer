@@ -92,7 +92,7 @@ func getDestinationPath(config *Config) (string, error) {
 
 	vrchatPath, err := findSteamGameDirectory("VRChat")
 	if err != nil {
-		return vrchatPath, nil
+		return "", errorRequired
 	}
 
 	_, err = os.Stat(filepath.Join(vrchatPath, "EasyAntiCheat"))
@@ -100,5 +100,5 @@ func getDestinationPath(config *Config) (string, error) {
 		return "", fmt.Errorf("EasyAntiCheat folder not found in %s", vrchatPath)
 	}
 
-	return "", errorRequired
+	return vrchatPath, nil
 }
