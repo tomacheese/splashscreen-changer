@@ -94,4 +94,7 @@ pip install -r requirements.txt
 6. PR 本文の崩れがないことを確認する。
 
 ## リポジトリ固有
-- 目的: [English](README.md) | [日本語](README-ja.md)
+- 概要: Randomize SplashScreen in EasyAntiCheat
+- 公開 URL: https://tomacheese.github.io/splashscreen-changer/
+- 主要言語: Python
+- CI 定義: `.github/workflows/` を参照
