@@ -37,3 +37,4 @@ pip install -r requirements.txt
 - 既存のプロジェクトルールがある場合はそれを優先する。
 
 ## リポジトリ固有
+- 目的: [English](README.md) | [日本語](README-ja.md)
