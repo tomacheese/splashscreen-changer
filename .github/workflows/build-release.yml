@@ -55,7 +55,7 @@ jobs:
         run: go test -v ./...
 
       - name: 🚀 GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@v7
         with:
           args: release --clean ${{ github.event.pull_request.merged == false && '--skip=validate,publish --snapshot' || '' }}
         env:
