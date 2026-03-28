@@ -1,15 +1,10 @@
 name: Build and Release
 
 on:
-  pull_request:
-    branches:
-      - main
-      - master
-    types:
-      - opened
-      - synchronize
-    paths:
-      - .github/workflows/build-release.yml
+  # pull_request を除去し、pull_request_target のみに統一する
+  # pull_request_target はフォーク PR・同一リポジトリ PR の両方で発火する
+  # フォーク PR: environment: fork-pr-build の承認ゲートでブロック
+  # 同一リポジトリ PR: environment: が '' のため承認不要で実行
   pull_request_target:
     branches:
       - main
@@ -21,15 +16,72 @@ on:
       - closed
   merge_group:
 
+# ワークフロー全体のデフォルト権限を無効化（各ジョブで最小権限を明示する）
+permissions: {}
+
+# synchronize のたびに run が積み上がることを防ぐ
+# event_name を含めることで、異なるイベントのキャンセルを独立させる
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  post-approval-request:
+    name: Post approval request
+    runs-on: ubuntu-latest
+    # フォーク PR のときのみ承認リクエストを投稿する（同一リポジトリからの PR は不要）
+    # closed イベントの場合は承認コメント不要のため除外する
+    if: github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository && github.event.action != 'closed'
+    # コメント投稿の失敗はワークフロー結論に影響させない（セキュリティゲートは environment: が担保する）
+    continue-on-error: true
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Find existing approval request comment
+        id: find-comment
+        # サプライチェーンリスク低減のため pull_request_target 上の write 権限ジョブではコミット SHA にピン留めする
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: github-actions[bot]
+          body-includes: Environment 承認待ち
+
+      - name: Post or update approval request comment
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            ## Environment 承認待ち
+
+            この PR のビルドを実行するには、Environment `fork-pr-build` の承認が必要です。
+
+            [Actions run を確認して承認してください](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}?pr=${{ github.event.pull_request.number }})
+
   build-and-release:
     runs-on: ubuntu-latest
+    needs: post-approval-request
+    # post-approval-request の結果に関わらず常に実行する
+    # セキュリティゲートは environment: が担保するため、コメント投稿の失敗でスキップされてはならない
+    # closed かつ未マージの場合はジョブ自体をスキップする（不要な実行を防ぐ）
+    if: >-
+      always() &&
+      (github.event.action != 'closed' || github.event.pull_request.merged == true)
+    # フォーク PR の場合のみ Environment で手動承認が必要（同一リポジトリからの PR は不要）
+    # closed イベントの場合は承認不要:
+    #   - closed + merged == true  → ベースブランチのコードをチェックアウトして実行（安全）
+    #   - closed + merged == false → if: 条件によりジョブ自体がスキップされるため実行されない
+    environment: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository && github.event.action != 'closed' && 'fork-pr-build' || '' }}
+    permissions:
+      contents: write
     steps:
       - name: 📥 Check out the repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.merged == true && github.base_ref || github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.merged == true && github.base_ref || github.event.pull_request.head.sha || github.sha }}
 
       - name: 🏷️ Bump version and push tag
         id: tag-version
@@ -57,7 +109,9 @@ jobs:
       - name: 🚀 GoReleaser
         uses: goreleaser/goreleaser-action@v7
         with:
-          args: release --clean ${{ github.event.pull_request.merged == false && '--skip=validate,publish --snapshot' || '' }}
+          # merged != true を使うことで merge_group イベント（merged が空文字）でも安全にスナップショットビルドとなる
+          # merged == false だと GitHub Actions の loose comparison で空文字が false と等価にならず意図通りに動かない
+          args: release --clean ${{ github.event.pull_request.merged != true && '--skip=validate,publish --snapshot' || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
