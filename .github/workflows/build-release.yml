@@ -70,7 +70,9 @@ jobs:
       always() &&
       (github.event.action != 'closed' || github.event.pull_request.merged == true)
     # フォーク PR の場合のみ Environment で手動承認が必要（同一リポジトリからの PR は不要）
-    # closed イベントの場合は承認不要（ベースブランチのコードを使う）
+    # closed イベントの場合は承認不要:
+    #   - closed + merged == true  → ベースブランチのコードをチェックアウトして実行（安全）
+    #   - closed + merged == false → if: 条件によりジョブ自体がスキップされるため実行されない
     environment: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository && github.event.action != 'closed' && 'fork-pr-build' || '' }}
     permissions:
       contents: write
