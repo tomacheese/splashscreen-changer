@@ -109,7 +109,9 @@ jobs:
       - name: 🚀 GoReleaser
         uses: goreleaser/goreleaser-action@v7
         with:
-          args: release --clean ${{ github.event.pull_request.merged == false && '--skip=validate,publish --snapshot' || '' }}
+          # merged != true を使うことで merge_group イベント（merged が空文字）でも安全にスナップショットビルドとなる
+          # merged == false だと GitHub Actions の loose comparison で空文字が false と等価にならず意図通りに動かない
+          args: release --clean ${{ github.event.pull_request.merged != true && '--skip=validate,publish --snapshot' || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
