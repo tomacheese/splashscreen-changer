@@ -2,7 +2,7 @@ module github.com/tomacheese/splashscreen-changer
 
 go 1.25.0
 
-toolchain go1.26.1
+toolchain go1.26.2
 
 require (
 	github.com/andygrunwald/vdf v1.1.0
