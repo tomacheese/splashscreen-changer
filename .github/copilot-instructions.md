@@ -18,9 +18,13 @@ replaces the EasyAntiCheat splash screen. All source is in
   `main`, errors are logged with `log.Println` and the function returns; keep
   that pattern. `log.Fatal` is only acceptable for unrecoverable startup
   failures (log-file setup), as in existing code.
-- Error strings returned to users must be in English and lowercase-initial
-  (e.g. `fmt.Errorf("destination width must be greater than 0")`). Flag new
-  error strings written in Japanese or with a capitalized first word.
+- Error strings returned to users must be in English. Prefer a lowercase
+  initial (e.g. `fmt.Errorf("destination width must be greater than 0")`), but a
+  proper noun that legitimately begins the string is fine — existing code has
+  `fmt.Errorf("EasyAntiCheat folder not found ...")` and
+  `fmt.Errorf("LibraryFolders not found ...")`. Flag new error strings written
+  in Japanese, or needlessly capitalized (sentence-cased) first words that are
+  not proper nouns.
 - Wrap or annotate errors with enough context to locate the failing path; avoid
   discarding errors with `_`.
 

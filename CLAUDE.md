@@ -12,15 +12,18 @@ executable (module path `github.com/tomacheese/splashscreen-changer`).
 ## Development commands
 
 - `go build ./cmd/splashscreen-changer` — build the CLI.
-- `go test -v ./...` — run unit tests (run in CI on every push/PR).
+- `go test -v ./...` — run unit tests (run in CI on pull requests via
+  `build-release.yml` and on push to `main`/`master` via `build.yml`; not on
+  ordinary feature-branch pushes).
 - `go mod download` — install dependencies.
 - `go fmt ./...` then `git diff --exit-code` — formatting check. CI fails if
   `go fmt` produces any diff, so always run `go fmt ./...` before committing.
 - `go run ./cmd/splashscreen-changer -help` — show flags and env vars.
 - `go run ./cmd/splashscreen-changer -version` — show version/build date.
 
-There is no `golangci-lint` config; `go fmt` (plus `go vet`) is the only
-enforced style gate. The devcontainer sets `go vet` flag `-unsafeptr=false`.
+There is no `golangci-lint` config. `go fmt` is the only style gate enforced in
+CI. `go vet` is not run in CI; it is available locally, and the devcontainer
+sets its `-unsafeptr=false` flag.
 
 ## Architecture / key files
 
@@ -41,8 +44,13 @@ All source lives in `cmd/splashscreen-changer/`:
   (Pictures) lookup, same build-tag split.
 
 Path resolution precedence (see `args.go`): (1) env var, (2) config file, then
-(3) auto-detect — Pictures/VRChat for source, Steam library VRChat install for
-destination. Config file path itself: `-config` flag or `CONFIG_PATH` env var,
+(3) auto-detect. For destination, auto-detect locates the Steam library VRChat
+install (and requires an `EasyAntiCheat` subfolder). For source, note that
+auto-detect is currently non-functional: `getSourcePath` returns the
+`source.path is required` error even when a `Pictures/VRChat` folder is found
+(it returns `vrchatPath, errorRequired`), and `main.go` bails out on that error,
+so source must in practice be supplied via env var or config file. Config file
+path itself: `-config` flag or `CONFIG_PATH` env var,
 defaulting to `data/config.yml` next to the executable (or the CWD under
 `go run`). Config keys map to env vars as `SECTION_FIELD` (e.g. `SOURCE_PATH`,
 `DESTINATION_WIDTH`).
