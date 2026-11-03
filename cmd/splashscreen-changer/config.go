@@ -25,11 +25,12 @@ type Config struct {
 	} `yaml:"log"`
 }
 
-// 設定ファイルを読み込む
+// LoadConfig loads the config file (if it exists), applies environment variable
+// overrides and defaults, then validates the result.
 func LoadConfig(filename string) (*Config, error) {
 	var config Config
 
-	// 設定ファイルが存在する場合のみ読み込む
+	// Read the file only if it exists
 	if _, err := os.Stat(filename); err == nil {
 		data, err := os.ReadFile(filename)
 		if err != nil {
@@ -41,18 +42,18 @@ func LoadConfig(filename string) (*Config, error) {
 		}
 	}
 
-	// 環境変数で設定を上書き
+	// Override with environment variables
 	overrideConfigWithEnv(&config)
 
-	// デフォルト値を設定
+	// Apply defaults
 	setDefaults(&config)
 
-	// 設定ファイルの内容をチェック
+	// Validate
 	err := checkConfig(&config)
 	return &config, err
 }
 
-// 環境変数で設定を動的に取得する
+// getEnv returns the environment variable value, or defaultValue if it is not set.
 func getEnv(key string, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
@@ -60,7 +61,7 @@ func getEnv(key string, defaultValue string) string {
 	return defaultValue
 }
 
-// 環境変数で設定を動的に取得する
+// overrideConfigWithEnv overrides non-empty SECTION_FIELD environment variables onto config, using reflection.
 func overrideConfigWithEnv(config *Config) {
 	configValue := reflect.ValueOf(config).Elem()
 	configType := configValue.Type()
@@ -96,7 +97,7 @@ func overrideConfigWithEnv(config *Config) {
 	}
 }
 
-// デフォルト値を設定する
+// setDefaults fills zero-valued fields from their `default` struct tags.
 func setDefaults(config *Config) {
 	configValue := reflect.ValueOf(config).Elem()
 
@@ -130,9 +131,8 @@ func setDefaults(config *Config) {
 	}
 }
 
-// 設定ファイルの内容をチェックする
+// checkConfig validates the loaded config.
 func checkConfig(config *Config) error {
-	// 各フィールドが空でないかチェック
 	configValue := reflect.ValueOf(config).Elem()
 	configType := configValue.Type()
 
@@ -145,7 +145,7 @@ func checkConfig(config *Config) error {
 			fieldType := sectionType.Field(j)
 			fieldName := configType.Field(i).Name + "." + fieldType.Name
 
-			// required タグが付いている場合、空の値が設定されていないかチェック
+			// Fields tagged required:"true" must not be empty
 			if required, _ := fieldType.Tag.Lookup("required"); required == "true" {
 				switch field.Kind() {
 				case reflect.String:
@@ -165,7 +165,7 @@ func checkConfig(config *Config) error {
 		}
 	}
 
-	// パスが存在するかチェック
+	// Paths must exist
 	if config.Source.Path != "" {
 		if _, err := os.Stat(config.Source.Path); err != nil {
 			return fmt.Errorf("source path '%s' does not exist", config.Source.Path)
@@ -177,19 +177,19 @@ func checkConfig(config *Config) error {
 			return fmt.Errorf("destination path '%s' does not exist", config.Destination.Path)
 		}
 
-		// destination.path には "EasyAntiCheat" ディレクトリが存在すること
+		// destination.path must contain an "EasyAntiCheat" directory
 		eacPath := config.Destination.Path + "/EasyAntiCheat"
 		if _, err := os.Stat(eacPath); err != nil {
 			return fmt.Errorf("EasyAntiCheat directory not found in destination path '%s'", config.Destination.Path)
 		}
 	}
 
-	// destination.width が 0 より大きいこと
+	// destination.width must be greater than 0
 	if config.Destination.Width <= 0 {
 		return fmt.Errorf("destination width must be greater than 0")
 	}
 
-	// destination.height が 0 より大きいこと
+	// destination.height must be greater than 0
 	if config.Destination.Height <= 0 {
 		return fmt.Errorf("destination height must be greater than 0")
 	}

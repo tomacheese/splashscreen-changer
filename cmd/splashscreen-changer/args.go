@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// ヘルプメッセージを表示する関数
+// printHelp prints usage, flags and the environment variables derived from Config.
 func printHelp() {
 	fmt.Println("Usage: splashscreen-changer [options]")
 	fmt.Println("Options:")
@@ -17,7 +17,7 @@ func printHelp() {
 	fmt.Println("Environment Variables:")
 	fmt.Printf("  %-20s %s\n", "CONFIG_PATH", "Path to the configuration file (default: data/config.yml)")
 
-	// Config 構造体のフィールドから環境変数のキーを生成して表示
+	// Environment variable keys are SECTION_FIELD, generated from the Config struct fields.
 	configType := reflect.TypeOf(Config{})
 	for i := 0; i < configType.NumField(); i++ {
 		section := configType.Field(i)
@@ -41,21 +41,22 @@ func printHelp() {
 }
 
 func getSourcePath(config *Config) (string, error) {
-	// 取得の優先度は以下。
-	// 1. 環境変数 SOURCE_PATH
-	// 2. 設定ファイル source.path
-	// 3. ユーザーフォルダの Pictures フォルダ内、VRChat フォルダ
-	// エラー。
-
-	// 1, 2 については、config.go にて実装済み。空値できた場合のみ、3 を行う
-	// 3 については、ユーザーフォルダの Pictures フォルダ内に VRChat フォルダが存在するか確認し、存在する場合はそのパスを返す
+	// Resolution order:
+	// 1. Environment variable SOURCE_PATH
+	// 2. source.path in the config file
+	// 3. The VRChat folder inside the user's Pictures folder
+	// Otherwise an error is returned.
+	//
+	// 1 and 2 are already merged into config by config.go, so only step 3 is handled here.
+	// Note: in step 3 the VRChat path is returned together with errorRequired even when
+	// the folder exists, so the caller treats it as an error (auto-detection is effectively disabled).
 	if config.Source.Path != "" {
 		return config.Source.Path, nil
 	}
 
 	errorRequired := fmt.Errorf("source.path is required")
 
-	// ユーザーフォルダの Pictures フォルダ内に VRChat フォルダが存在するか確認
+	// Check whether a VRChat folder exists in the Pictures folder (legacy location first)
 	picturesLegacyPath, errLegacy := getPicturesLegacyPath()
 	picturesNewPath, err := getPicturesPath()
 	if errLegacy != nil && err != nil {
@@ -76,14 +77,14 @@ func getSourcePath(config *Config) (string, error) {
 }
 
 func getDestinationPath(config *Config) (string, error) {
-	// 取得の優先度は以下。
-	// 1. 環境変数 DESTINATION_PATH
-	// 2. 設定ファイル destination.path
-	// 3. Steam ライブラリフォルダから、VRChat のインストール先を取得
-	// エラー。
-
-	// 1, 2 については、config.go にて実装済み。空値できた場合のみ、3 を行う
-	// 3 については、Steam ライブラリフォルダから、VRChat のインストール先フォルダを返す（EasyAntiCheatフォルダがあることを確認する）。見つからない場合はエラーを返す
+	// Resolution order:
+	// 1. Environment variable DESTINATION_PATH
+	// 2. destination.path in the config file
+	// 3. The VRChat install folder found via the Steam library folders
+	// Otherwise an error is returned.
+	//
+	// 1 and 2 are already merged into config by config.go, so only step 3 is handled here.
+	// Step 3 requires an EasyAntiCheat folder inside the install folder.
 	if config.Destination.Path != "" {
 		return config.Destination.Path, nil
 	}

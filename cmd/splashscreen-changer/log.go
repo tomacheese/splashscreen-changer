@@ -7,9 +7,9 @@ import (
 )
 
 func getLogFilePath(logParamPath *string) string {
-	// ログフォルダパスは環境変数 LOG_PATH または引数 -log で指定し、指定されていない場合は "logs/" とする。
-	// "logs/" の場所は、実行ファイルと同じディレクトリにあるものとする。go runで実行する場合は、カレントディレクトリにあるものとする。
-	// ログファイルのファイル名は、yyyy-mm-dd.log とする。
+	// An explicit log path (config log.path / LOG_PATH) is used as-is.
+	// Otherwise the log file is "logs/yyyy-mm-dd.log" next to the executable,
+	// or relative to the current directory under `go run`.
 	if *logParamPath != "" {
 		return *logParamPath
 	}
