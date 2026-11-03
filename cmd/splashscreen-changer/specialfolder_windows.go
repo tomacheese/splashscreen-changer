@@ -9,7 +9,7 @@ import (
 	"unsafe"
 )
 
-// SHGetKnownFolderPathを使うための設定
+// Lazy-loaded Win32 procedures and known-folder GUIDs for SHGetKnownFolderPath
 var (
 	modShell32               = syscall.NewLazyDLL("shell32.dll")
 	procSHGetKnownFolderPath = modShell32.NewProc("SHGetKnownFolderPath")
@@ -19,10 +19,10 @@ var (
 	FOLDERID_Pictures        = syscall.GUID{Data1: 0x33E28130, Data2: 0x4E1E, Data3: 0x4676, Data4: [8]byte{0x83, 0x5A, 0x98, 0x5A, 0x76, 0x87, 0x67, 0x4D}}
 )
 
-// getKnownFolderPath は、指定されたKnown Folderのパスを取得します。
+// getKnownFolderPath returns the path of the given Known Folder.
 func getKnownFolderPath(folderID *syscall.GUID) (string, error) {
 	var pathPtr uintptr
-	// SHGetKnownFolderPathを呼び出してフォルダパスを取得
+	// Call SHGetKnownFolderPath to get the folder path
 	ret, _, _ := procSHGetKnownFolderPath.Call(
 		uintptr(unsafe.Pointer(folderID)),
 		0,
@@ -32,9 +32,9 @@ func getKnownFolderPath(folderID *syscall.GUID) (string, error) {
 	if ret != 0 {
 		return "", fmt.Errorf("failed to get folder path, error code: %d", ret)
 	}
-	defer procCoTaskMemFree.Call(pathPtr) // メモリ解放
+	defer procCoTaskMemFree.Call(pathPtr) // free the memory
 
-	// ポインタから文字列を取得
+	// Convert the returned pointer to a Go string
 	return syscall.UTF16ToString((*[1 << 16]uint16)(unsafe.Pointer(pathPtr))[:]), nil
 }
 

@@ -16,18 +16,18 @@ import (
 	"golang.org/x/image/draw"
 )
 
-// 指定されたディレクトリ以下のすべてのPNGファイルをリストする関数
+// listPNGFiles lists .png files under root (recursively if isRecursive, otherwise only directly under root).
 func listPNGFiles(root string, isRecursive bool) ([]string, error) {
 	var pngFiles []string
 
 	if isRecursive {
-		// Walk関数で指定されたディレクトリ以下を再帰的に探索
+		// Walk the directory tree recursively
 		err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 
-			// ファイルで拡張子が.pngのものだけをリストに追加
+			// Only regular files with a .png extension
 			if !info.IsDir() && strings.HasSuffix(strings.ToLower(info.Name()), ".png") {
 				pngFiles = append(pngFiles, path)
 			}
@@ -38,7 +38,7 @@ func listPNGFiles(root string, isRecursive bool) ([]string, error) {
 			return nil, err
 		}
 	} else {
-		// 指定されたディレクトリの直下のみを探索
+		// Only direct children of root
 		files, err := os.ReadDir(root)
 		if err != nil {
 			return nil, err
@@ -54,18 +54,18 @@ func listPNGFiles(root string, isRecursive bool) ([]string, error) {
 	return pngFiles, nil
 }
 
-// PNGファイルリストからラダムに1つ選択する関数
+// pickRandomFile picks one file at random; it returns an error if files is empty.
 func pickRandomFile(files []string) (string, error) {
 	if len(files) == 0 {
 		return "", fmt.Errorf("no PNG files found")
 	}
 
-	rand.Seed(uint64(time.Now().UnixNano())) // 現在時刻をシードにして乱数を初期化
+	rand.Seed(uint64(time.Now().UnixNano())) // seed with the current time
 	randomIndex := rand.Intn(len(files))
 	return files[randomIndex], nil
 }
 
-// 画像を指定されたアスペクト比に切り取る関数
+// cropToAspectRatio center-crops img to the aspect ratio of width x height and scales it to width x height.
 func cropToAspectRatio(img image.Image, width, height int) image.Image {
 	srcBounds := img.Bounds()
 	srcWidth := srcBounds.Dx()
@@ -76,35 +76,31 @@ func cropToAspectRatio(img image.Image, width, height int) image.Image {
 
 	var cropRect image.Rectangle
 	if srcAspectRatio > destAspectRatio {
-		// 横長の場合、左右を切り取る
+		// Source is wider: crop left and right
 		newWidth := int(destAspectRatio * float64(srcHeight))
 		x0 := (srcWidth - newWidth) / 2
 		cropRect = image.Rect(x0, 0, x0+newWidth, srcHeight)
 	} else {
-		// 縦長の場合、上下を切り取る
+		// Source is taller: crop top and bottom
 		newHeight := int(float64(srcWidth) / destAspectRatio)
 		y0 := (srcHeight - newHeight) / 2
 		cropRect = image.Rect(0, y0, srcWidth, y0+newHeight)
 	}
 
-	// 指定された範囲を切り取る
+	// Crop to the computed rectangle
 	croppedImg := img.(interface {
 		SubImage(r image.Rectangle) image.Image
 	}).SubImage(cropRect)
 
-	// 切り取った画像を指定のサイズにリサイズ
+	// Scale the cropped image to the target size
 	dst := image.NewRGBA(image.Rect(0, 0, width, height))
 	draw.CatmullRom.Scale(dst, dst.Rect, croppedImg, croppedImg.Bounds(), draw.Over, nil)
 
 	return dst
 }
 
-// resizePNGFileは、指定されたPNG画像を指定の幅と高さにリサイズし、保存します。
-// リサイズの際、元の画像のアスペクト比が異なる場合は、中央を基準にクロップ（切り取り）します。
-// - srcPath: 元のPNGファイルのパス
-// - destPath: リサイズ後のPNGファイルの保存先パス
-// - width: リサイズ後の画像の幅
-// - height: リサイズ後の画像の高さ
+// resizePNGFile resizes the image at srcPath to width x height and saves it as a PNG at destPath.
+// If the aspect ratio differs, the image is center-cropped first.
 func resizePNGFile(srcPath, destPath string, width, height int) error {
 	srcFile, err := os.Open(srcPath)
 	if err != nil {
@@ -117,7 +113,7 @@ func resizePNGFile(srcPath, destPath string, width, height int) error {
 		return err
 	}
 
-	// アスペクト比を調整
+	// Adjust the aspect ratio
 	srcImage = cropToAspectRatio(srcImage, width, height)
 
 	destImage := image.NewRGBA(image.Rect(0, 0, width, height))
@@ -152,8 +148,9 @@ func isGoRun() bool {
 }
 
 func getConfigPath(configParamPath *string) string {
-	// 設定ファイルパスは環境変数 CONFIG_PATH または引数 -config で指定し、指定されていない場合は "data/config.yml" とする。
-	// "data/config.yml" の場所は、実行ファイルと同じディレクトリにあるものとする。go runで実行する場合は、カレントディレクトリにあるものとする。
+	// An explicit path (-config flag / CONFIG_PATH env var) is used as-is.
+	// Otherwise the default is "data/config.yml" next to the executable,
+	// or relative to the current directory under `go run`.
 	if *configParamPath != "" {
 		return *configParamPath
 	}
@@ -172,19 +169,19 @@ func getConfigPath(configParamPath *string) string {
 }
 
 func main() {
-	// コマンドライン引数を解析する
+	// Parse command-line flags
 	helpFlag := flag.Bool("help", false, "Show help message")
 	versionFlag := flag.Bool("version", false, "Show version")
 	configParamPath := flag.String("config", os.Getenv("CONFIG_PATH"), "Path to the configuration file")
 	flag.Parse()
 
-	// ヘルプメッセージを表示する
+	// Show help
 	if *helpFlag {
 		printHelp()
 		return
 	}
 
-	// バージョン情報を表示する
+	// Show version
 	if *versionFlag {
 		log.Println("splashscreen-changer")
 		log.Println("|- Version", GetAppVersion())
@@ -192,7 +189,7 @@ func main() {
 		return
 	}
 
-	// 設定ファイルを読み込む。
+	// Load the config file
 	configPath := getConfigPath(configParamPath)
 
 	log.Println("Loading config file:", configPath)
@@ -202,9 +199,9 @@ func main() {
 		return
 	}
 
-	// ログファイルを開く
+	// Open the log file
 	path := getLogFilePath(&config.Log.Path)
-	// ログファイルの親ディレクトリが存在しない場合は作成する
+	// Create the log file's parent directory if missing
 	if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
@@ -241,26 +238,26 @@ func main() {
 		return
 	}
 
-	// 設定値を表示する
+	// Log the effective settings
 	log.Printf("Source Path: %s\n", sourcePath)
 	log.Printf("Source Recursive: %t\n", config.Source.Recursive)
 	log.Printf("Destination Path: %s\n", destinationPath)
 	log.Printf("Destination Width: %d\n", config.Destination.Width)
 	log.Printf("Destination Height: %d\n", config.Destination.Height)
 
-	// ソースディレクトリ以下のPNGファイルをリストする
+	// List PNG files in the source directory
 	files, err := listPNGFiles(sourcePath, config.Source.Recursive)
 	if err != nil {
 		log.Println("Error:", err)
 		return
 	}
 
-	// ランダムで1つのファイルを選択する
 	if len(files) == 0 {
 		log.Println("No PNG files found")
 		return
 	}
 
+	// Pick one file at random
 	pickedFile, err := pickRandomFile(files)
 	if err != nil {
 		log.Println("Error:", err)
@@ -269,7 +266,7 @@ func main() {
 
 	log.Println("Picked file:", pickedFile)
 
-	// ファイルをリサイズして EasyAntiCheat ディレクトリに保存する
+	// Resize and save into the EasyAntiCheat directory
 	destFile := filepath.Join(destinationPath, "EasyAntiCheat", "SplashScreen.png")
 	err = resizePNGFile(pickedFile, destFile, config.Destination.Width, config.Destination.Height)
 	if err != nil {

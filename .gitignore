@@ -36,3 +36,5 @@ venv/
 logs/
 
 site/
+# Local build output
+/splashscreen-changer
