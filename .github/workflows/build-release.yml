@@ -82,6 +82,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.merged == true && github.base_ref || github.event.pull_request.head.sha || github.sha }}
+          allow-unsafe-pr-checkout: true
 
       - name: 🏷️ Bump version and push tag
         id: tag-version
