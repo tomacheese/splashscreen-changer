@@ -33,7 +33,7 @@ All source lives in `cmd/splashscreen-changer/`:
 - `versioning.go` — `version`/`date` injected by GoReleaser; falls back to `debug.ReadBuildInfo()`, else `"unknown"`.
 - `steam_*.go`, `specialfolder_*.go` — Steam library and Windows known-folder (Pictures) lookup, split by `//go:build windows` / `!windows` (the `_other.go` files are stubs).
 
-Path resolution: (1) env var, (2) config file, (3) auto-detect. Destination auto-detect finds the Steam VRChat install (requires an `EasyAntiCheat` subfolder). Source auto-detect is currently non-functional: `getSourcePath` returns `source.path is required` even when `Pictures/VRChat` exists, so source must be set via env var or config file. Config path: `-config` flag or `CONFIG_PATH`, default `data/config.yml` next to the executable (current directory under `go run`).
+Path resolution: (1) env var, (2) config file, (3) auto-detect. Destination auto-detect finds the Steam VRChat install (requires an `EasyAntiCheat` subfolder). Source auto-detect uses the `VRChat` folder inside the user's Pictures folder (Windows only) when it exists. Config path: `-config` flag or `CONFIG_PATH`, default `data/config.yml` next to the executable (current directory under `go run`).
 
 Other: `docs/` + `mkdocs.yml` + `requirements.txt` (MkDocs Material site, GitHub Pages), `.goreleaser.yaml` (linux/windows/darwin release builds), `config.yaml.sample`.
 

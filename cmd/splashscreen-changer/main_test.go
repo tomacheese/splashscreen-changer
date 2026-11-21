@@ -1,12 +1,56 @@
 package main
 
 import (
+	"errors"
 	"image"
 	"image/png"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 )
+
+func TestMainConfigLoadFailureExitCode(t *testing.T) {
+	if os.Getenv("SPLASH_TEST_RUN_MAIN") == "1" {
+		os.Args = []string{"splashscreen-changer", "-config", os.Getenv("SPLASH_TEST_CONFIG")}
+		os.Unsetenv("CONFIG_PATH")
+		main()
+		return
+	}
+
+	cases := map[string]string{
+		"invalid YAML": "source: [unclosed",
+		"zero width":   "destination:\n  width: 0\n",
+	}
+	for name, content := range cases {
+		t.Run(name, func(t *testing.T) {
+			configPath := filepath.Join(t.TempDir(), "config.yml")
+			if err := os.WriteFile(configPath, []byte(content), 0o644); err != nil {
+				t.Fatalf("Failed to write config file: %v", err)
+			}
+
+			cmd := exec.Command(os.Args[0], "-test.run=^TestMainConfigLoadFailureExitCode$")
+			cmd.Env = append(os.Environ(),
+				"SPLASH_TEST_RUN_MAIN=1",
+				"SPLASH_TEST_CONFIG="+configPath,
+				"DESTINATION_WIDTH=", "DESTINATION_HEIGHT=", "SOURCE_PATH=", "DESTINATION_PATH=",
+			)
+			output, err := cmd.CombinedOutput()
+
+			var exitErr *exec.ExitError
+			if !errors.As(err, &exitErr) {
+				t.Fatalf("Expected an *exec.ExitError, got %v\noutput: %s", err, output)
+			}
+			if exitErr.ExitCode() != 1 {
+				t.Errorf("Expected exit code 1, got %d\noutput: %s", exitErr.ExitCode(), output)
+			}
+			if !strings.Contains(string(output), "Failed to load configuration file:") {
+				t.Errorf("Expected output to contain the failure message, got: %s", output)
+			}
+		})
+	}
+}
 
 // Test listPNGFiles function
 func TestListPNGFiles(t *testing.T) {
