@@ -30,6 +30,9 @@ type Config struct {
 func LoadConfig(filename string) (*Config, error) {
 	var config Config
 
+	// Defaults go first so that explicit file/env values, including false and 0, override them
+	setDefaults(&config)
+
 	// Read the file only if it exists
 	if _, err := os.Stat(filename); err == nil {
 		data, err := os.ReadFile(filename)
@@ -44,9 +47,6 @@ func LoadConfig(filename string) (*Config, error) {
 
 	// Override with environment variables
 	overrideConfigWithEnv(&config)
-
-	// Apply defaults
-	setDefaults(&config)
 
 	// Validate
 	err := checkConfig(&config)
@@ -97,7 +97,8 @@ func overrideConfigWithEnv(config *Config) {
 	}
 }
 
-// setDefaults fills zero-valued fields from their `default` struct tags.
+// setDefaults sets every field that has a `default` struct tag to that default.
+// It must run before the file and environment values are applied.
 func setDefaults(config *Config) {
 	configValue := reflect.ValueOf(config).Elem()
 
@@ -112,19 +113,13 @@ func setDefaults(config *Config) {
 			if defaultValue, exists := fieldType.Tag.Lookup("default"); exists {
 				switch field.Kind() {
 				case reflect.String:
-					if field.String() == "" {
-						field.SetString(defaultValue)
-					}
+					field.SetString(defaultValue)
 				case reflect.Bool:
-					if !field.Bool() {
-						boolValue, _ := strconv.ParseBool(defaultValue)
-						field.SetBool(boolValue)
-					}
+					boolValue, _ := strconv.ParseBool(defaultValue)
+					field.SetBool(boolValue)
 				case reflect.Int:
-					if field.Int() == 0 {
-						intValue, _ := strconv.Atoi(defaultValue)
-						field.SetInt(int64(intValue))
-					}
+					intValue, _ := strconv.Atoi(defaultValue)
+					field.SetInt(int64(intValue))
 				}
 			}
 		}

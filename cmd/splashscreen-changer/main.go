@@ -195,8 +195,7 @@ func main() {
 	log.Println("Loading config file:", configPath)
 	config, err := LoadConfig(configPath)
 	if err != nil {
-		log.Println("Failed to load configuration file:", err)
-		return
+		log.Fatalln("Failed to load configuration file:", err)
 	}
 
 	// Open the log file

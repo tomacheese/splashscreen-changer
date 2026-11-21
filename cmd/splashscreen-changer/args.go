@@ -48,8 +48,6 @@ func getSourcePath(config *Config) (string, error) {
 	// Otherwise an error is returned.
 	//
 	// 1 and 2 are already merged into config by config.go, so only step 3 is handled here.
-	// Note: in step 3 the VRChat path is returned together with errorRequired even when
-	// the folder exists, so the caller treats it as an error (auto-detection is effectively disabled).
 	if config.Source.Path != "" {
 		return config.Source.Path, nil
 	}
@@ -70,7 +68,7 @@ func getSourcePath(config *Config) (string, error) {
 
 	vrchatPath := filepath.Join(picturesPath, "VRChat")
 	if _, err := os.Stat(vrchatPath); err == nil {
-		return vrchatPath, errorRequired
+		return vrchatPath, nil
 	}
 
 	return "", errorRequired

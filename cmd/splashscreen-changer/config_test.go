@@ -223,3 +223,74 @@ destination:
 		t.Errorf("Expected destination height to be 720, got %d", config.Destination.Height)
 	}
 }
+
+func clearConfigEnv(t *testing.T) {
+	t.Helper()
+	for _, key := range []string{"SOURCE_RECURSIVE", "DESTINATION_WIDTH", "DESTINATION_HEIGHT", "SOURCE_PATH", "DESTINATION_PATH"} {
+		t.Setenv(key, "")
+	}
+}
+
+func writeTempConfig(t *testing.T, content string) string {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "config.yml")
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatalf("Failed to write config file: %v", err)
+	}
+	return path
+}
+
+func newValidDirsConfig(t *testing.T, extraSource string) string {
+	t.Helper()
+	root := t.TempDir()
+	source := filepath.Join(root, "source")
+	destination := filepath.Join(root, "destination")
+	if err := os.MkdirAll(source, os.ModePerm); err != nil {
+		t.Fatalf("Failed to create source directory: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(destination, "EasyAntiCheat"), os.ModePerm); err != nil {
+		t.Fatalf("Failed to create destination directory: %v", err)
+	}
+	content := "source:\n  path: " + source + "\n" + extraSource + "destination:\n  path: " + destination + "\n"
+	return writeTempConfig(t, content)
+}
+
+func TestLoadConfigRecursiveFalseFromFile(t *testing.T) {
+	clearConfigEnv(t)
+	configPath := newValidDirsConfig(t, "  recursive: false\n")
+
+	config, err := LoadConfig(configPath)
+	if err != nil {
+		t.Fatalf("Failed to load config: %v", err)
+	}
+	if config.Source.Recursive {
+		t.Errorf("Expected source recursive to be false, got true")
+	}
+}
+
+func TestLoadConfigRecursiveFalseFromEnv(t *testing.T) {
+	clearConfigEnv(t)
+	t.Setenv("SOURCE_RECURSIVE", "false")
+	configPath := newValidDirsConfig(t, "")
+
+	config, err := LoadConfig(configPath)
+	if err != nil {
+		t.Fatalf("Failed to load config: %v", err)
+	}
+	if config.Source.Recursive {
+		t.Errorf("Expected source recursive to be false, got true")
+	}
+}
+
+func TestLoadConfigExplicitZeroWidth(t *testing.T) {
+	clearConfigEnv(t)
+	configPath := writeTempConfig(t, "destination:\n  width: 0\n")
+
+	_, err := LoadConfig(configPath)
+	if err == nil {
+		t.Fatalf("Expected an error for destination.width 0, got nil")
+	}
+	if err.Error() != "destination width must be greater than 0" {
+		t.Errorf("Unexpected error: %q", err.Error())
+	}
+}
